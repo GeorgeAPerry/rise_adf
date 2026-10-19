@@ -1,0 +1,63 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-rise-adf-sedev-uksouth-01"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-rise-sedev-uksouth-01.vault.azure.net/"
+		},
+		"mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/1a84218a-5c98-4173-8b49-afd9d3c6a0c8/resourceGroups/rg-rise-postgres-sedev-uksouth-01/providers/Microsoft.DBforPostgreSQL/flexibleServers/psql-rise-postgres-sedev-uksouth-01"
+		},
+		"mep-rise-postgres-sedev-uksouth-01_properties_groupId": {
+			"type": "string",
+			"defaultValue": "postgresqlServer"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adf-rise-adf-sedev-uksouth-01_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AzureKeyVault1_properties_typeProperties_baseUrl": {
+						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+					},
+					"mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId": {
+						"value": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId')]"
+					},
+					"mep-rise-postgres-sedev-uksouth-01_properties_groupId": {
+						"value": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_groupId')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
