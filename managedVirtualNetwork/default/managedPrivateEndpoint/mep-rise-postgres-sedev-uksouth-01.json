@@ -1,0 +1,7 @@
+{
+	"name": "mep-rise-postgres-sedev-uksouth-01",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/1a84218a-5c98-4173-8b49-afd9d3c6a0c8/resourceGroups/rg-rise-postgres-sedev-uksouth-01/providers/Microsoft.DBforPostgreSQL/flexibleServers/psql-rise-postgres-sedev-uksouth-01",
+		"groupId": "postgresqlServer"
+	}
+}

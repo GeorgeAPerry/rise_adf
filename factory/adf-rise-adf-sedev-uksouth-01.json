@@ -1,0 +1,15 @@
+{
+	"name": "adf-rise-adf-sedev-uksouth-01",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Enabled",
+			"editable": true
+		}
+	},
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "6a344125-fbf7-4d2e-949f-e31bb28bccec",
+		"tenantId": "6e51e1ad-c54b-4b39-b598-0ffe9ae68fef"
+	}
+}
