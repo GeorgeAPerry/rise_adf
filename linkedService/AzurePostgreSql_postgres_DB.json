@@ -1,0 +1,29 @@
+{
+	"name": "AzurePostgreSql_postgres_DB",
+	"properties": {
+		"description": "Linked service for default Postgres DB where Geo SCADA Source configuration will be loaded.",
+		"annotations": [],
+		"type": "AzurePostgreSql",
+		"version": "2.0",
+		"typeProperties": {
+			"server": "psql-rise-postgres-sedev-uksouth-01.postgres.database.azure.com",
+			"port": "5432",
+			"database": "postgres",
+			"sslMode": 2,
+			"username": "Schneider",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "pgadminpassword"
+			},
+			"authenticationType": "Basic"
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
