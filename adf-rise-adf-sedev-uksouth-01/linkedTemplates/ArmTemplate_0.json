@@ -18,6 +18,18 @@
 		"mep-rise-postgres-sedev-uksouth-01_properties_groupId": {
 			"type": "string",
 			"defaultValue": "postgresqlServer"
+		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "psql-rise-postgres-sedev-uksouth-01.postgres.database.azure.com"
+		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "postgres"
+		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "Schneider"
 		}
 	},
 	"variables": {
@@ -86,6 +98,41 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzurePostgreSql_postgres_DB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Linked service for default Postgres DB where Geo SCADA Source configuration will be loaded.",
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"version": "2.0",
+				"typeProperties": {
+					"server": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_server')]",
+					"port": "5432",
+					"database": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_database')]",
+					"sslMode": 2,
+					"username": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_username')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "pgadminpassword"
+					},
+					"authenticationType": "Basic"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime1",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime1')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
 			]
 		}
 	]

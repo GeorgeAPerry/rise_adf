@@ -8,6 +8,15 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://kv-rise-sedev-uksouth-01.vault.azure.net/"
 		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_server": {
+			"value": "psql-rise-postgres-sedev-uksouth-01.postgres.database.azure.com"
+		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_database": {
+			"value": "postgres"
+		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_username": {
+			"value": "Schneider"
+		},
 		"mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId": {
 			"value": "/subscriptions/1a84218a-5c98-4173-8b49-afd9d3c6a0c8/resourceGroups/rg-rise-postgres-sedev-uksouth-01/providers/Microsoft.DBforPostgreSQL/flexibleServers/psql-rise-postgres-sedev-uksouth-01"
 		},

@@ -11,6 +11,18 @@
 			"type": "string",
 			"defaultValue": "https://kv-rise-sedev-uksouth-01.vault.azure.net/"
 		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "psql-rise-postgres-sedev-uksouth-01.postgres.database.azure.com"
+		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "postgres"
+		},
+		"AzurePostgreSql_postgres_DB_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "Schneider"
+		},
 		"mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/1a84218a-5c98-4173-8b49-afd9d3c6a0c8/resourceGroups/rg-rise-postgres-sedev-uksouth-01/providers/Microsoft.DBforPostgreSQL/flexibleServers/psql-rise-postgres-sedev-uksouth-01"
@@ -54,6 +66,15 @@
 					},
 					"mep-rise-postgres-sedev-uksouth-01_properties_groupId": {
 						"value": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_groupId')]"
+					},
+					"AzurePostgreSql_postgres_DB_properties_typeProperties_server": {
+						"value": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_server')]"
+					},
+					"AzurePostgreSql_postgres_DB_properties_typeProperties_database": {
+						"value": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_database')]"
+					},
+					"AzurePostgreSql_postgres_DB_properties_typeProperties_username": {
+						"value": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_username')]"
 					}
 				}
 			},
