@@ -1,0 +1,12 @@
+{
+	"name": "ls_risedevstorage01",
+	"properties": {
+		"description": "Linked service to blob storage containing Geo SCADA SCXExport JSON files for ingest",
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://risedevstorage01.blob.core.windows.net/",
+			"accountKind": "StorageV2"
+		}
+	}
+}
