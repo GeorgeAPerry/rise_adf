@@ -30,6 +30,10 @@
 		"mep-rise-postgres-sedev-uksouth-01_properties_groupId": {
 			"type": "string",
 			"defaultValue": "postgresqlServer"
+		},
+		"ls_risedevstorage01_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://risedevstorage01.blob.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -133,6 +137,900 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_risedevstorage01')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Linked service to blob storage containing Geo SCADA SCXExport JSON files for ingest",
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"serviceEndpoint": "[parameters('ls_risedevstorage01_properties_typeProperties_serviceEndpoint')]",
+					"accountKind": "StorageV2"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_WWT_SCXExport_Data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_risedevstorage01",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "json",
+						"container": "adfwwtingestfiles"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"FullName": {
+							"type": "string"
+						},
+						"TypeName": {
+							"type": "string"
+						},
+						"Id": {
+							"type": "integer"
+						},
+						"Properties": {
+							"type": "object",
+							"properties": {
+								"AlarmViewId": {
+									"type": "string"
+								},
+								"DefaultViewId": {
+									"type": "string"
+								},
+								"AlarmEnableConfirm": {
+									"type": "integer"
+								},
+								"FLocL1toL3": {
+									"type": "string"
+								},
+								"AlternativeNameDefn": {
+									"type": "string"
+								},
+								"HelpViewId": {
+									"type": "string"
+								},
+								"MobileHelpViewId": {
+									"type": "string"
+								},
+								"ExcludeFromExclCtrl": {
+									"type": "boolean"
+								},
+								"Catchment": {
+									"type": "string"
+								},
+								"CbaDesc": {
+									"type": "string"
+								},
+								"FlocAltSiteSFCode": {
+									"type": "string"
+								},
+								"FlocAssetGroup": {
+									"type": "boolean"
+								},
+								"FlocAssetGroupLevel": {
+									"type": "string"
+								},
+								"FlocFullLevelOptional": {
+									"type": "string"
+								},
+								"FlocProcessGroup": {
+									"type": "boolean"
+								},
+								"FlocProcessGroupLevel": {
+									"type": "string"
+								},
+								"FlocSiteGroupLevel": {
+									"type": "string"
+								},
+								"FlocSiteGroupType": {
+									"type": "integer"
+								},
+								"OFWATPumpGroup": {
+									"type": "string"
+								},
+								"PersistenceReduced": {
+									"type": "boolean"
+								},
+								"SiteGroup": {
+									"type": "boolean"
+								},
+								"TWBusinessArea": {
+									"type": "string"
+								},
+								"TWWorkCentre": {
+									"type": "string"
+								},
+								"EthKeepAlive": {
+									"type": "boolean"
+								},
+								"EthKeepAliveInterval": {
+									"type": "integer"
+								},
+								"DirectOnDemand": {
+									"type": "boolean"
+								},
+								"DirectOnDemandRetries": {
+									"type": "integer"
+								},
+								"DirectOnDemandTimeout": {
+									"type": "integer"
+								},
+								"DirectOnDemandMaxTime": {
+									"type": "integer"
+								},
+								"SuppressConnectLogging": {
+									"type": "boolean"
+								},
+								"SuppressFailedLogging": {
+									"type": "boolean"
+								},
+								"PortA": {
+									"type": "integer"
+								},
+								"PortB": {
+									"type": "integer"
+								},
+								"DeviceProfileId": {
+									"type": "string"
+								},
+								"HealthCheckSeverityType": {
+									"type": "integer"
+								},
+								"HealthCheckSeverity": {
+									"type": "integer"
+								},
+								"ScanningAllowed": {
+									"type": "boolean"
+								},
+								"LoggedDataEnabled": {
+									"type": "boolean"
+								},
+								"LoggedDataPollInterval": {
+									"type": "integer"
+								},
+								"LoggedDataPollOffset": {
+									"type": "integer"
+								},
+								"FirmwareImageId": {
+									"type": "string"
+								},
+								"FirmwareDownloadConfirm": {
+									"type": "integer"
+								},
+								"Address": {
+									"type": "integer"
+								},
+								"IINSeverityType": {
+									"type": "integer"
+								},
+								"IINSeverity": {
+									"type": "integer"
+								},
+								"IntegrityPoll": {
+									"type": "boolean"
+								},
+								"IntegrityPollInterval": {
+									"type": "integer"
+								},
+								"IntegrityPollOffset": {
+									"type": "string"
+								},
+								"IntegrityPollType": {
+									"type": "integer"
+								},
+								"ReadOSCurrentTime": {
+									"type": "boolean"
+								},
+								"Class1Poll": {
+									"type": "boolean"
+								},
+								"Class1PollInterval": {
+									"type": "integer"
+								},
+								"Class1PollOffset": {
+									"type": "string"
+								},
+								"IgnoreClass1IINBit": {
+									"type": "boolean"
+								},
+								"Class2Poll": {
+									"type": "boolean"
+								},
+								"Class2PollInterval": {
+									"type": "integer"
+								},
+								"Class2PollOffset": {
+									"type": "string"
+								},
+								"IgnoreClass2IINBit": {
+									"type": "boolean"
+								},
+								"Class3Poll": {
+									"type": "boolean"
+								},
+								"Class3PollInterval": {
+									"type": "integer"
+								},
+								"Class3PollOffset": {
+									"type": "string"
+								},
+								"IgnoreClass3IINBit": {
+									"type": "boolean"
+								},
+								"IgnoreClassIINInterval": {
+									"type": "integer"
+								},
+								"EnableUnsolOnStartup": {
+									"type": "boolean"
+								},
+								"UnsolClass1": {
+									"type": "boolean"
+								},
+								"UnsolClass2": {
+									"type": "boolean"
+								},
+								"UnsolClass3": {
+									"type": "boolean"
+								},
+								"VTEnabled": {
+									"type": "boolean"
+								},
+								"VTPolledRetrieval": {
+									"type": "boolean"
+								},
+								"EnableUnsolRetryInt": {
+									"type": "integer"
+								},
+								"StartCommsMsg": {
+									"type": "integer"
+								},
+								"ReadDeviceAttribs": {
+									"type": "integer"
+								},
+								"BinaryInEventsScanGroup": {
+									"type": "integer"
+								},
+								"BinOutEventsScanGroup": {
+									"type": "integer"
+								},
+								"DblBinInEventsScanGroup": {
+									"type": "integer"
+								},
+								"AnalogInEventsScanGroup": {
+									"type": "integer"
+								},
+								"AnalOutEventsScanGroup": {
+									"type": "integer"
+								},
+								"CounterEventsScanGroup": {
+									"type": "integer"
+								},
+								"StringEventsScanGroup": {
+									"type": "integer"
+								},
+								"DataSetPollInterval": {
+									"type": "integer"
+								},
+								"StringPointsPoll": {
+									"type": "integer"
+								},
+								"StringPointsPollIntervl": {
+									"type": "integer"
+								},
+								"StringPointsPollOffset": {
+									"type": "string"
+								},
+								"SetClockInitiate": {
+									"type": "integer"
+								},
+								"SetClockMethod": {
+									"type": "integer"
+								},
+								"ClockDrift": {
+									"type": "integer"
+								},
+								"ClockDriftMinimum": {
+									"type": "integer"
+								},
+								"ClockDriftMaximum": {
+									"type": "integer"
+								},
+								"ClockDriftAbortSetClock": {
+									"type": "boolean"
+								},
+								"SetClockSeverity": {
+									"type": "integer"
+								},
+								"FreezeSupported": {
+									"type": "boolean"
+								},
+								"FreezeAck": {
+									"type": "boolean"
+								},
+								"CounterResetMethod": {
+									"type": "integer"
+								},
+								"FileTransferVariation": {
+									"type": "integer"
+								},
+								"FileTransRequiresAuthen": {
+									"type": "boolean"
+								},
+								"FileTransUsername": {
+									"type": "string"
+								},
+								"FileTransPassword": {
+									"type": "string"
+								},
+								"FileTransPollInterval": {
+									"type": "integer"
+								},
+								"DNP3TimeoutsEnabled": {
+									"type": "boolean"
+								},
+								"DataLinkConfirm": {
+									"type": "integer"
+								},
+								"DataLinkRetries": {
+									"type": "integer"
+								},
+								"DataLinkTimeout": {
+									"type": "integer"
+								},
+								"ApplicationAttempts": {
+									"type": "integer"
+								},
+								"ApplicationTimeout": {
+									"type": "integer"
+								},
+								"PrePostAmbleEnabled": {
+									"type": "boolean"
+								},
+								"PreAmble": {
+									"type": "string"
+								},
+								"PostAmble": {
+									"type": "string"
+								},
+								"CommWithSCX6Slave": {
+									"type": "boolean"
+								},
+								"InService": {
+									"type": "boolean"
+								},
+								"ConfirmDisableEnable": {
+									"type": "integer"
+								},
+								"SetId": {
+									"type": "string"
+								},
+								"DutyDuty": {
+									"type": "boolean"
+								},
+								"CommsAvailability": {
+									"type": "integer"
+								},
+								"CommsAvailableOffset": {
+									"type": "integer"
+								},
+								"CommsAvailableDuration": {
+									"type": "integer"
+								},
+								"CommsAvailableInterval": {
+									"type": "integer"
+								},
+								"LogHistRecordOnFailure": {
+									"type": "boolean"
+								},
+								"LogHistRecordPersist": {
+									"type": "integer"
+								},
+								"Severity": {
+									"type": "integer"
+								},
+								"AreaOfInterestId": {
+									"type": "string"
+								},
+								"ChannelAlarms": {
+									"type": "boolean"
+								},
+								"Asset": {
+									"type": "string"
+								},
+								"CorporateId": {
+									"type": "string"
+								},
+								"ExcludeFromPumpWizard": {
+									"type": "boolean"
+								},
+								"Information": {
+									"type": "string"
+								},
+								"OMSID": {
+									"type": "string"
+								},
+								"AlarmHandlerObjectId": {
+									"type": "string"
+								},
+								"AlarmHandlerMethod": {
+									"type": "string"
+								},
+								"AlarmSource": {
+									"type": "string"
+								},
+								"ConsAlarmsType": {
+									"type": "integer"
+								},
+								"ConsAlarmsMode": {
+									"type": "integer"
+								},
+								"ConsParentAlarmObjId": {
+									"type": "string"
+								},
+								"ConsParentAlarmCond": {
+									"type": "string"
+								},
+								"ConsParentAlarmTag": {
+									"type": "string"
+								},
+								"ConsAlarmsOperator": {
+									"type": "integer"
+								},
+								"ConsParentAlarmConstant": {
+									"type": "integer"
+								},
+								"ConsUnsuppressDelay": {
+									"type": "integer"
+								},
+								"ConsSuppressExistingAlm": {
+									"type": "boolean"
+								},
+								"AlarmComment": {
+									"type": "string"
+								},
+								"TWAlmReductionMode": {
+									"type": "integer"
+								},
+								"TemplateId": {
+									"type": "string"
+								}
+							}
+						},
+						"Aggregates": {
+							"type": "object",
+							"properties": {
+								"AlarmRedirection": {
+									"type": "object",
+									"properties": {
+										"TypeName": {
+											"type": "string"
+										},
+										"Properties": {
+											"type": "object",
+											"properties": {}
+										}
+									}
+								},
+								"UserMethods": {
+									"type": "object",
+									"properties": {
+										"TypeName": {
+											"type": "string"
+										},
+										"Properties": {
+											"type": "object",
+											"properties": {
+												"UserMethods.MethodObjectId1": {
+													"type": "string"
+												},
+												"UserMethods.MethodExpr1": {
+													"type": "string"
+												},
+												"UserMethods.MethodTitle1": {
+													"type": "string"
+												},
+												"UserMethods.MethodPriv1": {
+													"type": "integer"
+												},
+												"UserMethods.MethodAvailability1": {
+													"type": "integer"
+												},
+												"UserMethods.MethodObjectId2": {
+													"type": "string"
+												},
+												"UserMethods.MethodExpr2": {
+													"type": "string"
+												},
+												"UserMethods.MethodTitle2": {
+													"type": "string"
+												},
+												"UserMethods.MethodPriv2": {
+													"type": "integer"
+												},
+												"UserMethods.MethodAvailability2": {
+													"type": "integer"
+												},
+												"UserMethods.MethodObjectId3": {
+													"type": "string"
+												},
+												"UserMethods.MethodExpr3": {
+													"type": "string"
+												},
+												"UserMethods.MethodTitle3": {
+													"type": "string"
+												},
+												"UserMethods.MethodPriv3": {
+													"type": "integer"
+												},
+												"UserMethods.MethodAvailability3": {
+													"type": "integer"
+												},
+												"UserMethods.MethodObjectId4": {
+													"type": "string"
+												},
+												"UserMethods.MethodExpr4": {
+													"type": "string"
+												},
+												"UserMethods.MethodTitle4": {
+													"type": "string"
+												},
+												"UserMethods.MethodPriv4": {
+													"type": "integer"
+												},
+												"UserMethods.MethodAvailability4": {
+													"type": "integer"
+												},
+												"UserMethods.MethodObjectId5": {
+													"type": "string"
+												},
+												"UserMethods.MethodExpr5": {
+													"type": "string"
+												},
+												"UserMethods.MethodTitle5": {
+													"type": "string"
+												},
+												"UserMethods.MethodPriv5": {
+													"type": "integer"
+												},
+												"UserMethods.MethodAvailability5": {
+													"type": "integer"
+												}
+											}
+										}
+									}
+								},
+								"GISLocationSource": {
+									"type": "object",
+									"properties": {
+										"TypeName": {
+											"type": "string"
+										},
+										"Properties": {
+											"type": "object",
+											"properties": {}
+										}
+									}
+								},
+								"Network": {
+									"type": "object",
+									"properties": {
+										"TypeName": {
+											"type": "string"
+										},
+										"Properties": {
+											"type": "object",
+											"properties": {
+												"Network.DevicePort": {
+													"type": "integer"
+												},
+												"Network.Type": {
+													"type": "integer"
+												},
+												"Network.EndPoint": {
+													"type": "integer"
+												},
+												"Network.CallbackAllowed": {
+													"type": "boolean"
+												},
+												"Network.InboundAddress1": {
+													"type": "string"
+												},
+												"Network.InboundPort1": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort1": {
+													"type": "integer"
+												},
+												"Network.InboundType1": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint1": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber1": {
+													"type": "string"
+												},
+												"Network.InboundAddress2": {
+													"type": "string"
+												},
+												"Network.InboundPort2": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort2": {
+													"type": "integer"
+												},
+												"Network.InboundType2": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint2": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber2": {
+													"type": "string"
+												},
+												"Network.InboundAddress3": {
+													"type": "string"
+												},
+												"Network.InboundPort3": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort3": {
+													"type": "integer"
+												},
+												"Network.InboundType3": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint3": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber3": {
+													"type": "string"
+												},
+												"Network.InboundAddress4": {
+													"type": "string"
+												},
+												"Network.InboundPort4": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort4": {
+													"type": "integer"
+												},
+												"Network.InboundType4": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint4": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber4": {
+													"type": "string"
+												},
+												"Network.InboundAddress5": {
+													"type": "string"
+												},
+												"Network.InboundPort5": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort5": {
+													"type": "integer"
+												},
+												"Network.InboundType5": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint5": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber5": {
+													"type": "string"
+												},
+												"Network.InboundAddress6": {
+													"type": "string"
+												},
+												"Network.InboundPort6": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort6": {
+													"type": "integer"
+												},
+												"Network.InboundType6": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint6": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber6": {
+													"type": "string"
+												},
+												"Network.InboundAddress7": {
+													"type": "string"
+												},
+												"Network.InboundPort7": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort7": {
+													"type": "integer"
+												},
+												"Network.InboundType7": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint7": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber7": {
+													"type": "string"
+												},
+												"Network.InboundAddress8": {
+													"type": "string"
+												},
+												"Network.InboundPort8": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort8": {
+													"type": "integer"
+												},
+												"Network.InboundType8": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint8": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber8": {
+													"type": "string"
+												},
+												"Network.InboundAddress9": {
+													"type": "string"
+												},
+												"Network.InboundPort9": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort9": {
+													"type": "integer"
+												},
+												"Network.InboundType9": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint9": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber9": {
+													"type": "string"
+												},
+												"Network.InboundAddress10": {
+													"type": "string"
+												},
+												"Network.InboundPort10": {
+													"type": "integer"
+												},
+												"Network.InboundDevicePort10": {
+													"type": "integer"
+												},
+												"Network.InboundType10": {
+													"type": "integer"
+												},
+												"Network.InboundEndPoint10": {
+													"type": "integer"
+												},
+												"Network.InboundPhoneNumber10": {
+													"type": "string"
+												},
+												"Network.SchedConnectAllowed": {
+													"type": "boolean"
+												},
+												"Network.SchedConnectOffset": {
+													"type": "integer"
+												},
+												"Network.SchedConnectInterval": {
+													"type": "integer"
+												},
+												"Network.SchedConnectLowerWindow": {
+													"type": "integer"
+												},
+												"Network.SchedConnectUpperWindow": {
+													"type": "integer"
+												},
+												"Network.Address": {
+													"type": "string"
+												},
+												"Network.Port": {
+													"type": "integer"
+												}
+											}
+										}
+									}
+								},
+								"PSTN": {
+									"type": "object",
+									"properties": {
+										"TypeName": {
+											"type": "string"
+										},
+										"Properties": {
+											"type": "object",
+											"properties": {}
+										}
+									}
+								},
+								"ConfigReports": {
+									"type": "object",
+									"properties": {
+										"TypeName": {
+											"type": "string"
+										},
+										"Properties": {
+											"type": "object",
+											"properties": {
+												"ConfigReports.Life": {
+													"type": "integer"
+												}
+											}
+										}
+									}
+								},
+								"Security": {
+									"type": "object",
+									"properties": {
+										"TypeName": {
+											"type": "string"
+										},
+										"Properties": {
+											"type": "object",
+											"properties": {
+												"Security.HMACAlgorithm": {
+													"type": "integer"
+												},
+												"Security.KeyWrapAlgorithm": {
+													"type": "integer"
+												},
+												"Security.SessionKeyInterval": {
+													"type": "integer"
+												},
+												"Security.SessionKeyCount": {
+													"type": "integer"
+												},
+												"Security.AggressiveModeReceive": {
+													"type": "boolean"
+												},
+												"Security.AggressiveModeIssue": {
+													"type": "boolean"
+												},
+												"Security.MaximumErrorCount": {
+													"type": "integer"
+												},
+												"Security.Severity": {
+													"type": "integer"
+												},
+												"Security.AreaOfInterestId": {
+													"type": "string"
+												},
+												"Security.UpdateKey": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_risedevstorage01')]"
 			]
 		}
 	]

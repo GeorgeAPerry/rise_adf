@@ -23,6 +23,9 @@
 		"mep-rise-postgres-sedev-uksouth-01_properties_groupId": {
 			"value": "postgresqlServer"
 		},
+		"ls_risedevstorage01_properties_typeProperties_serviceEndpoint": {
+			"value": "https://risedevstorage01.blob.core.windows.net/"
+		},
 		"containerUri": {
 			"value": ""
 		},

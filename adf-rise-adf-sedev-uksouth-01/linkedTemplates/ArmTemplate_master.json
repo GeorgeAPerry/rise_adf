@@ -31,6 +31,10 @@
 			"type": "string",
 			"defaultValue": "postgresqlServer"
 		},
+		"ls_risedevstorage01_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://risedevstorage01.blob.core.windows.net/"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -60,6 +64,9 @@
 					},
 					"AzureKeyVault1_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+					},
+					"ls_risedevstorage01_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('ls_risedevstorage01_properties_typeProperties_serviceEndpoint')]"
 					},
 					"mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId": {
 						"value": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId')]"
