@@ -65,9 +65,6 @@
 					"AzureKeyVault1_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
 					},
-					"ls_risedevstorage01_properties_typeProperties_serviceEndpoint": {
-						"value": "[parameters('ls_risedevstorage01_properties_typeProperties_serviceEndpoint')]"
-					},
 					"mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId": {
 						"value": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId')]"
 					},
@@ -82,6 +79,9 @@
 					},
 					"AzurePostgreSql_postgres_DB_properties_typeProperties_username": {
 						"value": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_username')]"
+					},
+					"ls_risedevstorage01_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('ls_risedevstorage01_properties_typeProperties_serviceEndpoint')]"
 					}
 				}
 			},

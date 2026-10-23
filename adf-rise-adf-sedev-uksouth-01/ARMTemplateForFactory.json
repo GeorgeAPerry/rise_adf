@@ -41,6 +41,123 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pl Ingest WWT Data to Postgres')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copies WWT Geo SCADA Objects from blob storage into Postgres table and maps JSON properties to columns in Postgres",
+				"activities": [
+					{
+						"name": "Copy JSON to Postgres",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*.json",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzurePostgreSqlSink",
+								"writeBatchSize": 1000000,
+								"writeBatchTimeout": "00:30:00",
+								"writeMethod": "CopyCommand"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['FullName']"
+										},
+										"sink": {
+											"name": "fullname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['TypeName']"
+										},
+										"sink": {
+											"name": "typename",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Id']"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Properties']"
+										},
+										"sink": {
+											"name": "properties",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Aggregates']"
+										},
+										"sink": {
+											"name": "aggregates",
+											"type": "String"
+										}
+									}
+								],
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_WWT_SCXExport_Data",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_WWT_Objects",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_WWT_SCXExport_Data')]",
+				"[concat(variables('factoryId'), '/datasets/DS_WWT_Objects')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_WWT_Objects')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1007,12 +1124,12 @@
 					"authenticationType": "Basic"
 				},
 				"connectVia": {
-					"referenceName": "integrationRuntime1",
+					"referenceName": "AzureIR-ManagedVNet",
 					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime1')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-ManagedVNet')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
 			]
 		},
@@ -1027,9 +1144,47 @@
 				"typeProperties": {
 					"serviceEndpoint": "[parameters('ls_risedevstorage01_properties_typeProperties_serviceEndpoint')]",
 					"accountKind": "StorageV2"
+				},
+				"connectVia": {
+					"referenceName": "AzureIR-ManagedVNet",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-ManagedVNet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureIR-ManagedVNet')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "UK South",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						},
+						"pipelineExternalComputeScaleProperties": {
+							"timeToLive": 60,
+							"numberOfPipelineNodes": 1,
+							"numberOfExternalNodes": 1
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
