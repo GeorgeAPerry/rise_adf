@@ -23,6 +23,10 @@
 			"type": "string",
 			"defaultValue": "Schneider"
 		},
+		"ls_risedevstorage01_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://risedevstorage01.blob.core.windows.net/"
+		},
 		"mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/1a84218a-5c98-4173-8b49-afd9d3c6a0c8/resourceGroups/rg-rise-postgres-sedev-uksouth-01/providers/Microsoft.DBforPostgreSQL/flexibleServers/psql-rise-postgres-sedev-uksouth-01"
@@ -30,10 +34,6 @@
 		"mep-rise-postgres-sedev-uksouth-01_properties_groupId": {
 			"type": "string",
 			"defaultValue": "postgresqlServer"
-		},
-		"ls_risedevstorage01_properties_typeProperties_serviceEndpoint": {
-			"type": "string",
-			"defaultValue": "https://risedevstorage01.blob.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -41,118 +41,56 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/DS_WWT_Objects')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzurePostgreSql_postgres_DB",
+					"type": "LinkedServiceReference"
+				},
 				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzurePostgreSql_postgres_DB')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Linked service for default Postgres DB where Geo SCADA Source configuration will be loaded.",
-				"annotations": [],
-				"type": "AzurePostgreSql",
-				"version": "2.0",
-				"typeProperties": {
-					"server": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_server')]",
-					"port": "5432",
-					"database": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_database')]",
-					"sslMode": 2,
-					"username": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_username')]",
-					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyVault1",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "pgadminpassword"
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
 					},
-					"authenticationType": "Basic"
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime1",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime1')]",
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "Managed",
-				"typeProperties": {
-					"computeProperties": {
-						"location": "UK South",
-						"dataFlowProperties": {
-							"computeType": "General",
-							"coreCount": 8,
-							"timeToLive": 10,
-							"cleanup": false,
-							"customProperties": []
-						},
-						"pipelineExternalComputeScaleProperties": {
-							"timeToLive": 60,
-							"numberOfPipelineNodes": 1,
-							"numberOfExternalNodes": 1
-						}
+					{
+						"name": "fullname",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "typename",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "properties",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "aggregates",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
 					}
-				},
-				"managedVirtualNetwork": {
-					"type": "ManagedVirtualNetworkReference",
-					"referenceName": "default"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/default')]",
-			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
-			"apiVersion": "2018-06-01",
-			"properties": {},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/default/mep-rise-postgres-sedev-uksouth-01')]",
-			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"privateLinkResourceId": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId')]",
-				"groupId": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_groupId')]"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ls_risedevstorage01')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Linked service to blob storage containing Geo SCADA SCXExport JSON files for ingest",
-				"annotations": [],
-				"type": "AzureBlobStorage",
+				],
 				"typeProperties": {
-					"serviceEndpoint": "[parameters('ls_risedevstorage01_properties_typeProperties_serviceEndpoint')]",
-					"accountKind": "StorageV2"
+					"schema": "public",
+					"table": "wwt_objects"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_WWT_SCXExport_Data')]",
@@ -622,8 +560,7 @@
 											"type": "string"
 										},
 										"Properties": {
-											"type": "object",
-											"properties": {}
+											"type": "object"
 										}
 									}
 								},
@@ -722,8 +659,7 @@
 											"type": "string"
 										},
 										"Properties": {
-											"type": "object",
-											"properties": {}
+											"type": "object"
 										}
 									}
 								},
@@ -960,8 +896,7 @@
 											"type": "string"
 										},
 										"Properties": {
-											"type": "object",
-											"properties": {}
+											"type": "object"
 										}
 									}
 								},
@@ -1031,6 +966,120 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_risedevstorage01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzurePostgreSql_postgres_DB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Linked service for default Postgres DB where Geo SCADA Source configuration will be loaded.",
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"version": "2.0",
+				"typeProperties": {
+					"server": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_server')]",
+					"port": "5432",
+					"database": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_database')]",
+					"sslMode": 2,
+					"username": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_username')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "pgadminpassword"
+					},
+					"authenticationType": "Basic"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime1",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime1')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_risedevstorage01')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Linked service to blob storage containing Geo SCADA SCXExport JSON files for ingest",
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"serviceEndpoint": "[parameters('ls_risedevstorage01_properties_typeProperties_serviceEndpoint')]",
+					"accountKind": "StorageV2"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "UK South",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						},
+						"pipelineExternalComputeScaleProperties": {
+							"timeToLive": 60,
+							"numberOfPipelineNodes": 1,
+							"numberOfExternalNodes": 1
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/mep-rise-postgres-sedev-uksouth-01')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_groupId')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
 			]
 		}
 	]
