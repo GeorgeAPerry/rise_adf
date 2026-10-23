@@ -1,0 +1,106 @@
+{
+	"name": "pl Ingest WWT Data to Postgres",
+	"properties": {
+		"description": "Copies WWT Geo SCADA Objects from blob storage into Postgres table and maps JSON properties to columns in Postgres",
+		"activities": [
+			{
+				"name": "Copy JSON to Postgres",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"wildcardFileName": "*.json",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzurePostgreSqlSink",
+						"writeBatchSize": 1000000,
+						"writeBatchTimeout": "00:30:00",
+						"writeMethod": "CopyCommand"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['FullName']"
+								},
+								"sink": {
+									"name": "fullname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['TypeName']"
+								},
+								"sink": {
+									"name": "typename",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Id']"
+								},
+								"sink": {
+									"name": "id",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Properties']"
+								},
+								"sink": {
+									"name": "properties",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Aggregates']"
+								},
+								"sink": {
+									"name": "aggregates",
+									"type": "String"
+								}
+							}
+						],
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_WWT_SCXExport_Data",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_WWT_Objects",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
