@@ -1,0 +1,33 @@
+{
+	"name": "WWT_Objects",
+	"properties": {
+		"description": "Draft Dataflow: If Geo SCADA fullname starts with any of the Source site names, replace the old site name with the new rise site name",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_WWT_Objects",
+						"type": "DatasetReference"
+					},
+					"name": "GeoSCADAObjects"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          id as long,",
+				"          fullname as string,",
+				"          typename as string,",
+				"          properties as string,",
+				"          aggregates as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> GeoSCADAObjects"
+			]
+		}
+	}
+}
