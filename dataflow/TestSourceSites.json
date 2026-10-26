@@ -1,0 +1,32 @@
+{
+	"name": "TestSourceSites",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_SITE_MAPPING",
+						"type": "DatasetReference"
+					},
+					"name": "SiteMapping"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          Source_System as string,",
+				"          Source_Site_FullName as string,",
+				"          L1_Catchment_or_Region as string,",
+				"          L2_STW_Catchment_or_Hydraulic_System as string,",
+				"          L3_Treatment_Network_or_Production as string,",
+				"          L4_Site_Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> SiteMapping"
+			]
+		}
+	}
+}
