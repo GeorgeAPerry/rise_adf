@@ -1,0 +1,7 @@
+{
+	"name": "mep-rise-storage-sedev-uksouth-01",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/1a84218a-5c98-4173-8b49-afd9d3c6a0c8/resourceGroups/rg-rise-storage-sedev-uksouth-01/providers/Microsoft.Storage/storageAccounts/risedevstorage01",
+		"groupId": "blob"
+	}
+}
