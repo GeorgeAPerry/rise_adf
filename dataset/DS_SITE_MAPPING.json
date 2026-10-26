@@ -1,0 +1,48 @@
+{
+	"name": "DS_SITE_MAPPING",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_risedevstorage01",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "SiteMapping.csv",
+				"container": "sourcesites"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Source_System",
+				"type": "String"
+			},
+			{
+				"name": "Source_Site_FullName",
+				"type": "String"
+			},
+			{
+				"name": "L1_Catchment_or_Region",
+				"type": "String"
+			},
+			{
+				"name": "L2_STW_Catchment_or_Hydraulic_System",
+				"type": "String"
+			},
+			{
+				"name": "L3_Treatment_Network_or_Production",
+				"type": "String"
+			},
+			{
+				"name": "L4_Site_Name",
+				"type": "String"
+			}
+		]
+	}
+}
