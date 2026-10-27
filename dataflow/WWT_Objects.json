@@ -64,7 +64,8 @@
 				"     broadcast: 'auto')~> join1",
 				"join1 derive(l5 = split(fullname,'.')[5],",
 				"          point_shortname = split(fullname, '.')[size(split(fullname, '.'))],",
-				"          point_relativename = right(fullname, length(fullname) - length(source_site_fullname)-1)) ~> derivedColumn1"
+				"          point_relativename = right(fullname, length(fullname) - length(source_site_fullname)-1),",
+				"          rise_fullname = concat(rise_sitename,'.', right(fullname, length(fullname) - length(source_site_fullname)-1))) ~> derivedColumn1"
 			]
 		}
 	}
