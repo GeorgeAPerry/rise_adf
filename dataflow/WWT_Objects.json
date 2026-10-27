@@ -11,10 +11,24 @@
 						"type": "DatasetReference"
 					},
 					"name": "GeoSCADAObjects"
+				},
+				{
+					"linkedService": {
+						"referenceName": "AzurePostgreSql_postgres_DB",
+						"type": "LinkedServiceReference"
+					},
+					"name": "SiteMapping"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          id as long,",
@@ -26,7 +40,31 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> GeoSCADAObjects"
+				"     query: 'SELECT * FROM public.wwt_objects \\nWHERE typename IN (\\'CDNP3AnalogIn\\',\\'CDNP3AnalogOut\\',\\'CDNP3BinaryIn\\',\\'CDNP3String\\',\\'CICMPDigital\\',\\'CNTMonAlgPoint\\',\\'COdbcAlgPoint\\',\\'COdbcDigitalPoint\\',\\'COpcAlgPoint\\',\\'COpcDigitalPoin\\',\\'COpcTimePoint\\',\\'COpcXmlDaAlgPoint\\',\\'COpcXmlDaDigitalPoint\\',\\'COpcXmlDaStrPoint\\',\\'CProteusAIP\\',\\'CProteusAOP\\',\\'CProteusCA\\',\\'CProteusCD\\',\\'CProteusDGM\\',\\'CProteusDIP\\',\\'CProteusDOP\\',\\'CProteusDiurnal\\',\\'CProteusInt\\',\\'CProteusMax\\',\\'CProteusMean\\',\\'CProteusMin\\',\\'CProteusROC2\\',\\'CProteusRuntime\\',\\'CSNMPInteger\\',\\'CSNMPString\\',\\'CUP2000AIP4Limi\\',\\'CUP2000ChannelPSTN\\',\\'CUP2000DIP\\',\\'CUP2000OSPSTN\\',\\'CUP2000SetPSTN\\',\\'CWITSAnalogIn\\',\\'CWITSAnalogOut\\',\\'CWITSAppProgram\\',\\'CWITSBinaryIn\\',\\'CWITSBinaryNoChange\\',\\'CWITSBinaryOut\\',\\'CWITSCounter\\',\\'CWITSIntegrator\\',\\'CWITSMaximum\\',\\'CWITSMean\\',\\'CWITSMinimum\\',\\'CWITSPulseTripClose\\',\\'CWITSROC\\',\\'CWITSRuntime\\',\\'CWITSStateCounter\\',\\'HTMonitorPoint\\',\\'SparkplugBPointAg\\',\\'SparkplugBPointDg\\',\\'SparkplugBPointSt\\')',",
+				"     format: 'query') ~> GeoSCADAObjects",
+				"source(output(",
+				"          source_system as string,",
+				"          source_site_fullname as string,",
+				"          l1_catchment_or_region as string,",
+				"          l2_stw_catchment_or_hydraulic_system as string,",
+				"          l3_treatment_network_or_production as string,",
+				"          l4_site_name as string,",
+				"          rise_sitename as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'query',",
+				"     query: 'SELECT *,\\n       CONCAT_WS(\\'.\\',\\n           l1_catchment_or_region,\\n           l2_stw_catchment_or_hydraulic_system,\\n           l3_treatment_network_or_production,\\n           l4_site_name\\n       ) AS rise_sitename\\nFROM site_mapping\\nWHERE source_system = \\'WWT\\'',",
+				"     store: 'postgres',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> SiteMapping",
+				"GeoSCADAObjects, SiteMapping join(startsWith(fullname, concat(source_site_fullname, '.')),",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 derive(l5 = split(fullname,'.')[5],",
+				"          point_shortname = split(fullname, '.')[size(split(fullname, '.'))],",
+				"          point_relativename = right(fullname, length(fullname) - length(source_site_fullname)-1)) ~> derivedColumn1"
 			]
 		}
 	}
