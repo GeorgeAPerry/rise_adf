@@ -1,0 +1,53 @@
+{
+	"name": "DS_POST_SITE_MAPPING",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzurePostgreSql_postgres_DB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "source_system",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "source_site_fullname",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l1_catchment_or_region",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l2_stw_catchment_or_hydraulic_system",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l3_treatment_network_or_production",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l4_site_name",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "public",
+			"table": "site_mapping"
+		}
+	}
+}
