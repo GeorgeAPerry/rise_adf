@@ -1,0 +1,48 @@
+{
+	"name": "DS_POST_RISE_Objects",
+	"properties": {
+		"description": "To be exported for SCXBuilder",
+		"linkedServiceName": {
+			"referenceName": "AzurePostgreSql_postgres_DB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "fullname",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "typename",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "properties",
+				"type": "jsonb",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "aggregates",
+				"type": "jsonb",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "public",
+			"table": "rise_objects"
+		}
+	}
+}
