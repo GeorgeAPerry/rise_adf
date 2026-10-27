@@ -26,11 +26,105 @@
 							"type": "DelimitedTextReadSettings"
 						}
 					},
-					"enableStaging": false
+					"sink": {
+						"type": "AzurePostgreSqlSink",
+						"writeBatchSize": 1000000,
+						"writeBatchTimeout": "00:30:00",
+						"writeMethod": "CopyCommand"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Source_System",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "source_system",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Source_Site_FullName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "source_site_fullname",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L1_Catchment_or_Region",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l1_catchment_or_region",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L2_STW_Catchment_or_Hydraulic_System",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l2_stw_catchment_or_hydraulic_system",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L3_Treatment_Network_or_Production",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l3_treatment_network_or_production",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L4_Site_Name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l4_site_name",
+									"type": "String",
+									"physicalType": "text"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
 				},
 				"inputs": [
 					{
 						"referenceName": "DS_BLOB_SITE_MAPPING",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_POST_SITE_MAPPING",
 						"type": "DatasetReference"
 					}
 				]
