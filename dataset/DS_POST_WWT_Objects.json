@@ -1,5 +1,5 @@
 {
-	"name": "DS_WWT_Objects",
+	"name": "DS_POST_WWT_Objects",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzurePostgreSql_postgres_DB",

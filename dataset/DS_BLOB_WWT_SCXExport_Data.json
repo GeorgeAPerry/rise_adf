@@ -1,5 +1,5 @@
 {
-	"name": "DS_WWT_SCXExport_Data",
+	"name": "DS_BLOB_WWT_SCXExport_Data",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_risedevstorage01",

@@ -89,13 +89,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_WWT_SCXExport_Data",
+						"referenceName": "DS_BLOB_WWT_SCXExport_Data",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_WWT_Objects",
+						"referenceName": "DS_POST_WWT_Objects",
 						"type": "DatasetReference"
 					}
 				]

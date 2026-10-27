@@ -7,7 +7,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "DS_WWT_Objects",
+						"referenceName": "DS_POST_WWT_Objects",
 						"type": "DatasetReference"
 					},
 					"name": "GeoSCADAObjects"

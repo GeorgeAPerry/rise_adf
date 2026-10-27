@@ -1,5 +1,5 @@
 {
-	"name": "DS_SITE_MAPPING",
+	"name": "DS_BLOB_SITE_MAPPING",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_risedevstorage01",

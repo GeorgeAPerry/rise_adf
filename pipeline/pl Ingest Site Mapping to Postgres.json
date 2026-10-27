@@ -30,7 +30,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_SITE_MAPPING",
+						"referenceName": "DS_BLOB_SITE_MAPPING",
 						"type": "DatasetReference"
 					}
 				]
