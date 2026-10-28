@@ -1,5 +1,5 @@
 {
-	"name": "pl Ingest WWT Data to Postgres",
+	"name": "Ingest WWT Data to Postgres",
 	"properties": {
 		"description": "Copies WWT Geo SCADA Objects from blob storage into Postgres table and maps JSON properties to columns in Postgres",
 		"activities": [

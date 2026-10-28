@@ -1,5 +1,5 @@
 {
-	"name": "pl Ingest Site Mapping to Postgres",
+	"name": "Ingest Site Mapping to Postgres",
 	"properties": {
 		"activities": [
 			{
