@@ -1,5 +1,5 @@
 {
-	"name": "WWT_Objects",
+	"name": "WWT_Points_to_Rise",
 	"properties": {
 		"description": "Draft Dataflow: If Geo SCADA fullname starts with any of the Source site names, replace the old site name with the new rise site name",
 		"type": "MappingDataFlow",
@@ -23,10 +23,13 @@
 			"sinks": [],
 			"transformations": [
 				{
-					"name": "join1"
+					"name": "PointsWithValidSiteMapping"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "BuildRiseNames"
+				},
+				{
+					"name": "ColumnsForOutput"
 				}
 			],
 			"scriptLines": [
@@ -61,11 +64,19 @@
 				"     joinType:'cross',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
-				"join1 derive(l5 = split(fullname,'.')[5],",
+				"     broadcast: 'auto')~> PointsWithValidSiteMapping",
+				"PointsWithValidSiteMapping derive(l5 = split(fullname,'.')[5],",
 				"          point_shortname = split(fullname, '.')[size(split(fullname, '.'))],",
 				"          point_relativename = right(fullname, length(fullname) - length(source_site_fullname)-1),",
-				"          rise_fullname = concat(rise_sitename,'.', right(fullname, length(fullname) - length(source_site_fullname)-1))) ~> derivedColumn1"
+				"          rise_fullname = concat(rise_sitename,'.', right(fullname, length(fullname) - length(source_site_fullname)-1))) ~> BuildRiseNames",
+				"BuildRiseNames select(mapColumn(",
+				"          typename,",
+				"          properties,",
+				"          aggregates,",
+				"          fullname = rise_fullname",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ColumnsForOutput"
 			]
 		}
 	}
