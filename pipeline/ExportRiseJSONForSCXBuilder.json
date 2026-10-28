@@ -1,0 +1,52 @@
+{
+	"name": "ExportRiseJSONForSCXBuilder",
+	"properties": {
+		"activities": [
+			{
+				"name": "ExportJSON",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": "SELECT fullname, typename, properties, aggregates \nFROM rise_config\nORDER BY fullname asc;",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings",
+							"filePattern": "arrayOfObjects"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_POST_RISE_Objects",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_BLOB_ADF_EXPORT",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
