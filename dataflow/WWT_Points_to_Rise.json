@@ -20,7 +20,15 @@
 					"name": "SiteMapping"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "AzurePostgreSql_postgres_DB",
+						"type": "LinkedServiceReference"
+					},
+					"name": "SinkToDB"
+				}
+			],
 			"transformations": [
 				{
 					"name": "PointsWithValidSiteMapping"
@@ -33,6 +41,9 @@
 				},
 				{
 					"name": "SortByFullname"
+				},
+				{
+					"name": "Upsert"
 				}
 			],
 			"scriptLines": [
@@ -80,7 +91,18 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> ColumnsForOutput",
-				"ColumnsForOutput sort(asc(fullname, true)) ~> SortByFullname"
+				"ColumnsForOutput sort(asc(fullname, true)) ~> SortByFullname",
+				"SortByFullname alterRow(upsertIf(true())) ~> Upsert",
+				"Upsert sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     deletable: false,",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     upsertable: false,",
+				"     store: 'postgres',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SinkToDB"
 			]
 		}
 	}
