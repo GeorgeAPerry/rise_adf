@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzurePostgreSqlSource",
-						"query": "SELECT fullname, typename, properties, aggregates \nFROM rise_config\nORDER BY fullname asc;",
+						"query": "SELECT fullname, typename, properties, aggregates \nFROM rise_objects\nORDER BY fullname asc;",
 						"partitionOption": "None",
 						"queryTimeout": "02:00:00"
 					},
