@@ -101,6 +101,9 @@
 				]
 			}
 		],
+		"folder": {
+			"name": "Ingestion Pipelines"
+		},
 		"annotations": []
 	}
 }
