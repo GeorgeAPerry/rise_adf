@@ -1,0 +1,32 @@
+{
+	"name": "WWT Migration Pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "WWT Points",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "WWT_Points_to_Rise",
+						"type": "DataFlowReference"
+					},
+					"integrationRuntime": {
+						"referenceName": "AzureIR-ManagedVNet",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
