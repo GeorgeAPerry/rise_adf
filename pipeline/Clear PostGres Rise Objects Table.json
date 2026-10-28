@@ -22,7 +22,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "DELETE FROM public.rise_config"
+							"text": "DELETE FROM public.rise_objects"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
