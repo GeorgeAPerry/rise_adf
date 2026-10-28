@@ -19,6 +19,14 @@
 			"type": "string",
 			"defaultValue": "postgresqlServer"
 		},
+		"mep-rise-storage-sedev-uksouth-01_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/1a84218a-5c98-4173-8b49-afd9d3c6a0c8/resourceGroups/rg-rise-storage-sedev-uksouth-01/providers/Microsoft.Storage/storageAccounts/risedevstorage01"
+		},
+		"mep-rise-storage-sedev-uksouth-01_properties_groupId": {
+			"type": "string",
+			"defaultValue": "blob"
+		},
 		"AzurePostgreSql_postgres_DB_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "psql-rise-postgres-sedev-uksouth-01.postgres.database.azure.com"
@@ -137,6 +145,18 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/default/mep-rise-storage-sedev-uksouth-01')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('mep-rise-storage-sedev-uksouth-01_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('mep-rise-storage-sedev-uksouth-01_properties_groupId')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzurePostgreSql_postgres_DB')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -193,59 +213,60 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_WWT_Objects')]",
+			"name": "[concat(parameters('factoryName'), '/DS_BLOB_SITE_MAPPING')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzurePostgreSql_postgres_DB",
+					"referenceName": "ls_risedevstorage01",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "AzurePostgreSqlTable",
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "SiteMapping.csv",
+						"container": "sourcesites"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
 				"schema": [
 					{
-						"name": "id",
-						"type": "bigint",
-						"precision": 0,
-						"scale": 0
+						"name": "Source_System",
+						"type": "String"
 					},
 					{
-						"name": "fullname",
-						"type": "text",
-						"precision": 0,
-						"scale": 0
+						"name": "Source_Site_FullName",
+						"type": "String"
 					},
 					{
-						"name": "typename",
-						"type": "text",
-						"precision": 0,
-						"scale": 0
+						"name": "L1_Catchment_or_Region",
+						"type": "String"
 					},
 					{
-						"name": "properties",
-						"type": "jsonb",
-						"precision": 0,
-						"scale": 0
+						"name": "L2_STW_Catchment_or_Hydraulic_System",
+						"type": "String"
 					},
 					{
-						"name": "aggregates",
-						"type": "jsonb",
-						"precision": 0,
-						"scale": 0
+						"name": "L3_Treatment_Network_or_Production",
+						"type": "String"
+					},
+					{
+						"name": "L4_Site_Name",
+						"type": "String"
 					}
-				],
-				"typeProperties": {
-					"schema": "public",
-					"table": "wwt_objects"
-				}
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_risedevstorage01')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_WWT_SCXExport_Data')]",
+			"name": "[concat(parameters('factoryName'), '/DS_BLOB_WWT_SCXExport_Data')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1121,6 +1142,309 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_POST_RISE_Objects')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "To be exported for SCXBuilder",
+				"linkedServiceName": {
+					"referenceName": "AzurePostgreSql_postgres_DB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "fullname",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "typename",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "properties",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "aggregates",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "rise_objects"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_POST_SITE_MAPPING')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzurePostgreSql_postgres_DB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "source_system",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "source_site_fullname",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "l1_catchment_or_region",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "l2_stw_catchment_or_hydraulic_system",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "l3_treatment_network_or_production",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "l4_site_name",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "site_mapping"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_POST_WWT_Objects')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzurePostgreSql_postgres_DB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "fullname",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "typename",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "properties",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "aggregates",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "wwt_objects"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl Ingest Site Mapping to Postgres')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Site Mapping to Postgres",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzurePostgreSqlSink",
+								"writeBatchSize": 1000000,
+								"writeBatchTimeout": "00:30:00",
+								"writeMethod": "CopyCommand"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Source_System",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "source_system",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Source_Site_FullName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "source_site_fullname",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L1_Catchment_or_Region",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l1_catchment_or_region",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L2_STW_Catchment_or_Hydraulic_System",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l2_stw_catchment_or_hydraulic_system",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L3_Treatment_Network_or_Production",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l3_treatment_network_or_production",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L4_Site_Name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l4_site_name",
+											"type": "String",
+											"physicalType": "text"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_BLOB_SITE_MAPPING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_POST_SITE_MAPPING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_BLOB_SITE_MAPPING')]",
+				"[concat(variables('factoryId'), '/datasets/DS_POST_SITE_MAPPING')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl Ingest WWT Data to Postgres')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1213,14 +1537,14 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "DS_WWT_SCXExport_Data",
+								"referenceName": "DS_BLOB_WWT_SCXExport_Data",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "DS_WWT_Objects",
+								"referenceName": "DS_POST_WWT_Objects",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -1233,8 +1557,126 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_WWT_SCXExport_Data')]",
-				"[concat(variables('factoryId'), '/datasets/DS_WWT_Objects')]"
+				"[concat(variables('factoryId'), '/datasets/DS_BLOB_WWT_SCXExport_Data')]",
+				"[concat(variables('factoryId'), '/datasets/DS_POST_WWT_Objects')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WWT_Points_to_Rise')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Draft Dataflow: If Geo SCADA fullname starts with any of the Source site names, replace the old site name with the new rise site name",
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_POST_WWT_Objects",
+								"type": "DatasetReference"
+							},
+							"name": "GeoSCADAObjects"
+						},
+						{
+							"linkedService": {
+								"referenceName": "AzurePostgreSql_postgres_DB",
+								"type": "LinkedServiceReference"
+							},
+							"name": "SiteMapping"
+						}
+					],
+					"sinks": [
+						{
+							"linkedService": {
+								"referenceName": "AzurePostgreSql_postgres_DB",
+								"type": "LinkedServiceReference"
+							},
+							"name": "SinkToDB"
+						}
+					],
+					"transformations": [
+						{
+							"name": "PointsWithValidSiteMapping"
+						},
+						{
+							"name": "BuildRiseNames"
+						},
+						{
+							"name": "ColumnsForOutput"
+						},
+						{
+							"name": "SortByFullname"
+						},
+						{
+							"name": "Upsert"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          id as long,",
+						"          fullname as string,",
+						"          typename as string,",
+						"          properties as string,",
+						"          aggregates as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'SELECT * FROM public.wwt_objects \\nWHERE typename IN (\\'CDNP3AnalogIn\\',\\'CDNP3AnalogOut\\',\\'CDNP3BinaryIn\\',\\'CDNP3String\\',\\'CICMPDigital\\',\\'CNTMonAlgPoint\\',\\'COdbcAlgPoint\\',\\'COdbcDigitalPoint\\',\\'COpcAlgPoint\\',\\'COpcDigitalPoin\\',\\'COpcTimePoint\\',\\'COpcXmlDaAlgPoint\\',\\'COpcXmlDaDigitalPoint\\',\\'COpcXmlDaStrPoint\\',\\'CProteusAIP\\',\\'CProteusAOP\\',\\'CProteusCA\\',\\'CProteusCD\\',\\'CProteusDGM\\',\\'CProteusDIP\\',\\'CProteusDOP\\',\\'CProteusDiurnal\\',\\'CProteusInt\\',\\'CProteusMax\\',\\'CProteusMean\\',\\'CProteusMin\\',\\'CProteusROC2\\',\\'CProteusRuntime\\',\\'CSNMPInteger\\',\\'CSNMPString\\',\\'CUP2000AIP4Limi\\',\\'CUP2000ChannelPSTN\\',\\'CUP2000DIP\\',\\'CUP2000OSPSTN\\',\\'CUP2000SetPSTN\\',\\'CWITSAnalogIn\\',\\'CWITSAnalogOut\\',\\'CWITSAppProgram\\',\\'CWITSBinaryIn\\',\\'CWITSBinaryNoChange\\',\\'CWITSBinaryOut\\',\\'CWITSCounter\\',\\'CWITSIntegrator\\',\\'CWITSMaximum\\',\\'CWITSMean\\',\\'CWITSMinimum\\',\\'CWITSPulseTripClose\\',\\'CWITSROC\\',\\'CWITSRuntime\\',\\'CWITSStateCounter\\',\\'HTMonitorPoint\\',\\'SparkplugBPointAg\\',\\'SparkplugBPointDg\\',\\'SparkplugBPointSt\\')',",
+						"     format: 'query') ~> GeoSCADAObjects",
+						"source(output(",
+						"          source_system as string,",
+						"          source_site_fullname as string,",
+						"          l1_catchment_or_region as string,",
+						"          l2_stw_catchment_or_hydraulic_system as string,",
+						"          l3_treatment_network_or_production as string,",
+						"          l4_site_name as string,",
+						"          rise_sitename as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'query',",
+						"     query: 'SELECT *,\\n       CONCAT_WS(\\'.\\',\\n           l1_catchment_or_region,\\n           l2_stw_catchment_or_hydraulic_system,\\n           l3_treatment_network_or_production,\\n           l4_site_name\\n       ) AS rise_sitename\\nFROM site_mapping\\nWHERE source_system = \\'WWT\\'',",
+						"     store: 'postgres',",
+						"     isolationLevel: 'READ_UNCOMMITTED') ~> SiteMapping",
+						"GeoSCADAObjects, SiteMapping join(startsWith(fullname, concat(source_site_fullname, '.')),",
+						"     joinType:'cross',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> PointsWithValidSiteMapping",
+						"PointsWithValidSiteMapping derive(l5 = split(fullname,'.')[5],",
+						"          point_shortname = split(fullname, '.')[size(split(fullname, '.'))],",
+						"          point_relativename = right(fullname, length(fullname) - length(source_site_fullname)-1),",
+						"          rise_fullname = concat(rise_sitename,'.', right(fullname, length(fullname) - length(source_site_fullname)-1))) ~> BuildRiseNames",
+						"BuildRiseNames select(mapColumn(",
+						"          fullname = rise_fullname,",
+						"          properties,",
+						"          typename,",
+						"          aggregates",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> ColumnsForOutput",
+						"ColumnsForOutput sort(asc(fullname, true)) ~> SortByFullname",
+						"SortByFullname alterRow(upsertIf(true())) ~> Upsert",
+						"Upsert sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'table',",
+						"     tableName: 'rise_objects',",
+						"     schemaName: 'public',",
+						"     deletable: false,",
+						"     insertable: true,",
+						"     updateable: false,",
+						"     upsertable: true,",
+						"     keys:['fullname'],",
+						"     store: 'postgres',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SinkToDB"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_POST_WWT_Objects')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
 			]
 		}
 	]

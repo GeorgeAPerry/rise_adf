@@ -35,6 +35,14 @@
 			"type": "string",
 			"defaultValue": "postgresqlServer"
 		},
+		"mep-rise-storage-sedev-uksouth-01_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/1a84218a-5c98-4173-8b49-afd9d3c6a0c8/resourceGroups/rg-rise-storage-sedev-uksouth-01/providers/Microsoft.Storage/storageAccounts/risedevstorage01"
+		},
+		"mep-rise-storage-sedev-uksouth-01_properties_groupId": {
+			"type": "string",
+			"defaultValue": "blob"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -70,6 +78,12 @@
 					},
 					"mep-rise-postgres-sedev-uksouth-01_properties_groupId": {
 						"value": "[parameters('mep-rise-postgres-sedev-uksouth-01_properties_groupId')]"
+					},
+					"mep-rise-storage-sedev-uksouth-01_properties_privateLinkResourceId": {
+						"value": "[parameters('mep-rise-storage-sedev-uksouth-01_properties_privateLinkResourceId')]"
+					},
+					"mep-rise-storage-sedev-uksouth-01_properties_groupId": {
+						"value": "[parameters('mep-rise-storage-sedev-uksouth-01_properties_groupId')]"
 					},
 					"AzurePostgreSql_postgres_DB_properties_typeProperties_server": {
 						"value": "[parameters('AzurePostgreSql_postgres_DB_properties_typeProperties_server')]"
