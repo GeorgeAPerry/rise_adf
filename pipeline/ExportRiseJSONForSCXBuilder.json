@@ -31,7 +31,48 @@
 							"filePattern": "arrayOfObjects"
 						}
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "fullname",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['fullname']"
+								}
+							},
+							{
+								"source": {
+									"name": "typename",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['typename']"
+								}
+							},
+							{
+								"source": {
+									"name": "properties",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['properties']"
+								}
+							},
+							{
+								"source": {
+									"name": "aggregates",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['aggregates']"
+								}
+							}
+						]
+					}
 				},
 				"inputs": [
 					{
