@@ -1299,7 +1299,73 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl Ingest Site Mapping to Postgres')]",
+			"name": "[concat(parameters('factoryName'), '/Clear PostGres Rise Objects Table')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Delete GeoSCADA Rise Config from Postgres",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "AzurePostgreSql_postgres_DB",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "DELETE FROM public.rise_config"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_BLOB_ADF_EXPORT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_risedevstorage01",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "@concat('ADFExportdata_',formatDateTime(utcNow(), 'yyyyMMdd_HHmmss'),'.json')",
+						"container": "adfexport"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_risedevstorage01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest Site Mapping to Postgres')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1437,6 +1503,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "Ingestion Pipelines"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -1445,7 +1514,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl Ingest WWT Data to Postgres')]",
+			"name": "[concat(parameters('factoryName'), '/Ingest WWT Data to Postgres')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1553,6 +1622,9 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Ingestion Pipelines"
 				},
 				"annotations": []
 			},
@@ -1677,6 +1749,158 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_POST_WWT_Objects')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ExportRiseJSONForSCXBuilder')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ExportJSON",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzurePostgreSqlSource",
+								"query": "SELECT fullname, typename, properties, aggregates \nFROM rise_objects\nORDER BY fullname asc;",
+								"partitionOption": "None",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings",
+									"filePattern": "arrayOfObjects"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "fullname",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['fullname']"
+										}
+									},
+									{
+										"source": {
+											"name": "typename",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['typename']"
+										}
+									},
+									{
+										"source": {
+											"name": "properties",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['properties']"
+										}
+									},
+									{
+										"source": {
+											"name": "aggregates",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['aggregates']"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_POST_RISE_Objects",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_BLOB_ADF_EXPORT",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_POST_RISE_Objects')]",
+				"[concat(variables('factoryId'), '/datasets/DS_BLOB_ADF_EXPORT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WWT Migration Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "WWT Points",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "WWT_Points_to_Rise",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"GeoSCADAObjects": {},
+									"SiteMapping": {},
+									"SinkToDB": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "AzureIR-ManagedVNet",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/WWT_Points_to_Rise')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIR-ManagedVNet')]"
 			]
 		}
 	]
