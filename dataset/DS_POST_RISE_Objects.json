@@ -10,12 +10,6 @@
 		"type": "AzurePostgreSqlTable",
 		"schema": [
 			{
-				"name": "id",
-				"type": "bigint",
-				"precision": 0,
-				"scale": 0
-			},
-			{
 				"name": "fullname",
 				"type": "text",
 				"precision": 0,
