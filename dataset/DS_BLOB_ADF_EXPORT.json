@@ -1,0 +1,19 @@
+{
+	"name": "DS_BLOB_ADF_EXPORT",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_risedevstorage01",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "@concat('ADFExportdata_',formatDateTime(utcNow(), 'yyyyMMdd_HHmmss'),'.json')",
+				"container": "adfexport"
+			}
+		},
+		"schema": {}
+	}
+}
