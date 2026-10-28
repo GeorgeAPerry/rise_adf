@@ -30,6 +30,9 @@
 				},
 				{
 					"name": "ColumnsForOutput"
+				},
+				{
+					"name": "SortByFullname"
 				}
 			],
 			"scriptLines": [
@@ -76,7 +79,8 @@
 				"          fullname = rise_fullname",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> ColumnsForOutput"
+				"     skipDuplicateMapOutputs: true) ~> ColumnsForOutput",
+				"ColumnsForOutput sort(asc(fullname, true)) ~> SortByFullname"
 			]
 		}
 	}
