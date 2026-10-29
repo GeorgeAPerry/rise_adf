@@ -41,7 +41,7 @@
 									"type": "String"
 								},
 								"sink": {
-									"path": "$['fullname']"
+									"path": "$['FullName']"
 								}
 							},
 							{
@@ -50,7 +50,7 @@
 									"type": "String"
 								},
 								"sink": {
-									"path": "$['typename']"
+									"path": "$['TypeName']"
 								}
 							},
 							{
@@ -59,7 +59,7 @@
 									"type": "String"
 								},
 								"sink": {
-									"path": "$['properties']"
+									"path": "$['Properties']"
 								}
 							},
 							{
@@ -68,7 +68,7 @@
 									"type": "String"
 								},
 								"sink": {
-									"path": "$['aggregates']"
+									"path": "$['Aggregates']"
 								}
 							}
 						]
