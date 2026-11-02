@@ -18,6 +18,13 @@
 						"type": "LinkedServiceReference"
 					},
 					"name": "SiteMapping"
+				},
+				{
+					"linkedService": {
+						"referenceName": "AzurePostgreSql_postgres_DB",
+						"type": "LinkedServiceReference"
+					},
+					"name": "PointMapping"
 				}
 			],
 			"sinks": [
@@ -44,6 +51,12 @@
 				},
 				{
 					"name": "Upsert"
+				},
+				{
+					"name": "FindPointsMapping"
+				},
+				{
+					"name": "FinalRiseNames"
 				}
 			],
 			"scriptLines": [
@@ -74,16 +87,39 @@
 				"     query: 'SELECT *,\\n       CONCAT_WS(\\'.\\',\\n           l1_catchment_or_region,\\n           l2_stw_catchment_or_hydraulic_system,\\n           l3_treatment_network_or_production,\\n           l4_site_name\\n       ) AS rise_sitename\\nFROM site_mapping\\nWHERE source_system = \\'WWT\\'',",
 				"     store: 'postgres',",
 				"     isolationLevel: 'READ_UNCOMMITTED') ~> SiteMapping",
+				"source(output(",
+				"          legacy_scada as string,",
+				"          l4_site_name as string,",
+				"          l5_process_group as string,",
+				"          l6_asset_l1 as string,",
+				"          l7_asset_l2 as string,",
+				"          l8_signal as string,",
+				"          extracted_site as string,",
+				"          match_key as string,",
+				"          generalised_key as string,",
+				"          review_status as string,",
+				"          confirmed_l5_process_group as string,",
+				"          confirmed_l6_asset_l1 as string,",
+				"          confirmed_l7_asset_l2 as string,",
+				"          confirmed_l8_signal as string,",
+				"          point_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'query',",
+				"     query: 'SELECT * FROM public.legacy_scada_mapping',",
+				"     store: 'postgres',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> PointMapping",
 				"GeoSCADAObjects, SiteMapping join(startsWith(fullname, concat(source_site_fullname, '.')),",
 				"     joinType:'cross',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> PointsWithValidSiteMapping",
-				"PointsWithValidSiteMapping derive(l5 = split(fullname,'.')[5],",
+				"FindPointsMapping derive(l5 = split(fullname,'.')[5],",
 				"          point_shortname = split(fullname, '.')[size(split(fullname, '.'))],",
 				"          point_relativename = right(fullname, length(fullname) - length(source_site_fullname)-1),",
-				"          rise_fullname = concat(rise_sitename,'.', right(fullname, length(fullname) - length(source_site_fullname)-1))) ~> BuildRiseNames",
-				"BuildRiseNames select(mapColumn(",
+				"          rise_relativename = iif(lower(l5_process_group)=='unknown'||lower(l6_asset_l1)=='unknown'||lower(l7_asset_l2)=='unknown'||lower(l8_signal)=='unknown',right(fullname, length(fullname) - length(source_site_fullname)-1),'Known')) ~> BuildRiseNames",
+				"FinalRiseNames select(mapColumn(",
 				"          fullname = rise_fullname,",
 				"          properties,",
 				"          typename,",
@@ -93,6 +129,12 @@
 				"     skipDuplicateMapOutputs: true) ~> ColumnsForOutput",
 				"ColumnsForOutput sort(asc(fullname, true)) ~> SortByFullname",
 				"SortByFullname alterRow(upsertIf(true())) ~> Upsert",
+				"PointsWithValidSiteMapping, PointMapping join(fullname == legacy_scada,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> FindPointsMapping",
+				"BuildRiseNames derive(rise_fullname = concat(rise_sitename,'.', rise_relativename)) ~> FinalRiseNames",
 				"Upsert sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table',",
