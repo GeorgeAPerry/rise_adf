@@ -1,0 +1,246 @@
+{
+	"name": "Ingest Point Mapping to Postgres",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy Point Mapping to Postgres",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzurePostgreSqlSink",
+						"writeBatchSize": 1000000,
+						"writeBatchTimeout": "00:30:00",
+						"writeMethod": "CopyCommand"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Legacy SCADA",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "legacy_scada",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L4 Site Name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l4_site_name",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L5 Process Group",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l5_process_group",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L6 Asset L1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l6_asset_l1",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L7 Asset L2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l7_asset_l2",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "L8 Signal",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "l8_signal",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Extracted Site",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "extracted_site",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Match Key",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "match_key",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Generalised Key",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "generalised_key",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Review Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "review_status",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Confirmed L5 Process Group",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "confirmed_l5_process_group",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Confirmed L6 Asset L1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "confirmed_l6_asset_l1",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Confirmed L7 Asset L2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "confirmed_l7_asset_l2",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Confirmed L8 Signal",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "confirmed_l8_signal",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "Point Type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "point_type",
+									"type": "String",
+									"physicalType": "text"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_BLOB_POINT_MAPPING",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_POST_POINT_MAPPING",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Ingestion Pipelines"
+		},
+		"annotations": []
+	}
+}
