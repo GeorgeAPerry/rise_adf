@@ -1,0 +1,84 @@
+{
+	"name": "DS_BLOB_POINT_MAPPING",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_risedevstorage01",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "WESTERN_READING Points - Matt Test.csv",
+				"container": "pointmapping"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Legacy SCADA",
+				"type": "String"
+			},
+			{
+				"name": "L4 Site Name",
+				"type": "String"
+			},
+			{
+				"name": "L5 Process Group",
+				"type": "String"
+			},
+			{
+				"name": "L6 Asset L1",
+				"type": "String"
+			},
+			{
+				"name": "L7 Asset L2",
+				"type": "String"
+			},
+			{
+				"name": "L8 Signal",
+				"type": "String"
+			},
+			{
+				"name": "Extracted Site",
+				"type": "String"
+			},
+			{
+				"name": "Match Key",
+				"type": "String"
+			},
+			{
+				"name": "Generalised Key",
+				"type": "String"
+			},
+			{
+				"name": "Review Status",
+				"type": "String"
+			},
+			{
+				"name": "Confirmed L5 Process Group",
+				"type": "String"
+			},
+			{
+				"name": "Confirmed L6 Asset L1",
+				"type": "String"
+			},
+			{
+				"name": "Confirmed L7 Asset L2",
+				"type": "String"
+			},
+			{
+				"name": "Confirmed L8 Signal",
+				"type": "String"
+			},
+			{
+				"name": "Point Type",
+				"type": "String"
+			}
+		]
+	}
+}
