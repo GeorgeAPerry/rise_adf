@@ -57,6 +57,9 @@
 				},
 				{
 					"name": "FinalRiseNames"
+				},
+				{
+					"name": "DebuggingFilter"
 				}
 			],
 			"scriptLines": [
@@ -115,10 +118,25 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> PointsWithValidSiteMapping",
-				"FindPointsMapping derive(l5 = split(fullname,'.')[5],",
+				"DebuggingFilter derive(l5 = split(fullname,'.')[5],",
 				"          point_shortname = split(fullname, '.')[size(split(fullname, '.'))],",
 				"          point_relativename = right(fullname, length(fullname) - length(source_site_fullname)-1),",
-				"          rise_relativename = iif(lower(l5_process_group)=='unknown'||lower(l6_asset_l1)=='unknown'||lower(l7_asset_l2)=='unknown'||lower(l8_signal)=='unknown',right(fullname, length(fullname) - length(source_site_fullname)-1),'Known')) ~> BuildRiseNames",
+				"          rise_relativename = iif(\r",
+				"    lower(l5_process_group) == 'unknown' ||\r",
+				"    lower(l6_asset_l1) == 'unknown' ||\r",
+				"    lower(l7_asset_l2) == 'unknown' ||\r",
+				"    lower(l8_signal) == 'unknown',\r",
+				"\r",
+				"    right(fullname, length(fullname) - length(source_site_fullname) - 1),\r",
+				"\r",
+				"    concatWS(\r",
+				"        '.',\r",
+				"        iif(isNull(l5_process_group), '', l5_process_group),\r",
+				"        iif(isNull(l6_asset_l1), '', l6_asset_l1),\r",
+				"        iif(isNull(l7_asset_l2), '', l7_asset_l2),\r",
+				"        iif(isNull(l8_signal), '', l8_signal)\r",
+				"    )\r",
+				")) ~> BuildRiseNames",
 				"FinalRiseNames select(mapColumn(",
 				"          fullname = rise_fullname,",
 				"          properties,",
@@ -135,6 +153,8 @@
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> FindPointsMapping",
 				"BuildRiseNames derive(rise_fullname = concat(rise_sitename,'.', rise_relativename)) ~> FinalRiseNames",
+				"FindPointsMapping filter(/*fullname=='WESTERN.READING.BASINGSTOKE.Stoneyfield SPS.Analogue.Average Calculation' || fullname=='WESTERN.READING.BASINGSTOKE.Stoneyfield SPS.Communications.GPRS Signal Strength' */\r",
+				"true() /*enable this line to disable the filter*/) ~> DebuggingFilter",
 				"Upsert sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table',",
