@@ -1,0 +1,107 @@
+{
+	"name": "DS_POST_POINT_MAPPING",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzurePostgreSql_postgres_DB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "legacy_scada",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l4_site_name",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l5_process_group",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l6_asset_l1",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l7_asset_l2",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "l8_signal",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "extracted_site",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "match_key",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "generalised_key",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "review_status",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "confirmed_l5_process_group",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "confirmed_l6_asset_l1",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "confirmed_l7_asset_l2",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "confirmed_l8_signal",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "point_type",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "public",
+			"table": "legacy_scada_mapping"
+		}
+	}
+}
