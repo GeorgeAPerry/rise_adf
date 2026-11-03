@@ -5,12 +5,18 @@
 			"referenceName": "ls_risedevstorage01",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "BLOBS"
+		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "@concat('ADFExportdata_',formatDateTime(utcNow(), 'yyyyMMdd_HHmmss'),'.json')",
+				"fileName": {
+					"value": "@concat('ADFExportdata_',formatDateTime(utcNow(), 'yyyyMMdd_HHmmss'),'.json')",
+					"type": "Expression"
+				},
 				"container": "adfexport"
 			}
 		},

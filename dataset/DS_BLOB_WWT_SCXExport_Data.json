@@ -5,6 +5,9 @@
 			"referenceName": "ls_risedevstorage01",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "BLOBS"
+		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {

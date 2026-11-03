@@ -6,6 +6,9 @@
 			"referenceName": "AzurePostgreSql_postgres_DB",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "PostGres"
+		},
 		"annotations": [],
 		"type": "AzurePostgreSqlTable",
 		"schema": [
