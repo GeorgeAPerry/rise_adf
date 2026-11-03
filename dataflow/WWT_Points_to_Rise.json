@@ -6,9 +6,9 @@
 		"typeProperties": {
 			"sources": [
 				{
-					"dataset": {
-						"referenceName": "DS_POST_WWT_Objects",
-						"type": "DatasetReference"
+					"linkedService": {
+						"referenceName": "AzurePostgreSql_postgres_DB",
+						"type": "LinkedServiceReference"
 					},
 					"name": "GeoSCADAObjects"
 				},
@@ -45,9 +45,6 @@
 			],
 			"transformations": [
 				{
-					"name": "PointsWithValidSiteMapping"
-				},
-				{
 					"name": "BuildRiseNames"
 				},
 				{
@@ -82,9 +79,10 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     query: 'SELECT * FROM public.wwt_objects \\nWHERE typename IN (\\'CDNP3AnalogIn\\',\\'CDNP3AnalogOut\\',\\'CDNP3BinaryIn\\',\\'CDNP3String\\',\\'CICMPDigital\\',\\'CNTMonAlgPoint\\',\\'COdbcAlgPoint\\',\\'COdbcDigitalPoint\\',\\'COpcAlgPoint\\',\\'COpcDigitalPoin\\',\\'COpcTimePoint\\',\\'COpcXmlDaAlgPoint\\',\\'COpcXmlDaDigitalPoint\\',\\'COpcXmlDaStrPoint\\',\\'CProteusAIP\\',\\'CProteusAOP\\',\\'CProteusCA\\',\\'CProteusCD\\',\\'CProteusDGM\\',\\'CProteusDIP\\',\\'CProteusDOP\\',\\'CProteusDiurnal\\',\\'CProteusInt\\',\\'CProteusMax\\',\\'CProteusMean\\',\\'CProteusMin\\',\\'CProteusROC2\\',\\'CProteusRuntime\\',\\'CSNMPInteger\\',\\'CSNMPString\\',\\'CUP2000AIP4Limi\\',\\'CUP2000ChannelPSTN\\',\\'CUP2000DIP\\',\\'CUP2000OSPSTN\\',\\'CUP2000SetPSTN\\',\\'CWITSAnalogIn\\',\\'CWITSAnalogOut\\',\\'CWITSAppProgram\\',\\'CWITSBinaryIn\\',\\'CWITSBinaryNoChange\\',\\'CWITSBinaryOut\\',\\'CWITSCounter\\',\\'CWITSIntegrator\\',\\'CWITSMaximum\\',\\'CWITSMean\\',\\'CWITSMinimum\\',\\'CWITSPulseTripClose\\',\\'CWITSROC\\',\\'CWITSRuntime\\',\\'CWITSStateCounter\\',\\'HTMonitorPoint\\',\\'SparkplugBPointAg\\',\\'SparkplugBPointDg\\',\\'SparkplugBPointSt\\')',",
-				"     format: 'query') ~> GeoSCADAObjects",
+				"     format: 'query',",
+				"     query: 'SELECT * FROM public.wwt_objects',",
+				"     store: 'postgres',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> GeoSCADAObjects",
 				"source(output(",
 				"          source_system as string,",
 				"          source_site_fullname as string,",
@@ -133,20 +131,16 @@
 				"     query: 'SELECT * FROM public.waste_model_office',",
 				"     store: 'postgres',",
 				"     isolationLevel: 'READ_UNCOMMITTED') ~> WasteModelOffice",
-				"SitesInWasteModelOffice, SiteMapping join(startsWith(fullname, concat(source_site_fullname, '.')),",
-				"     joinType:'cross',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> PointsWithValidSiteMapping",
 				"DebuggingFilter derive(point_shortname = split(fullname, '.')[size(split(fullname, '.'))],",
-				"          point_relativename = right(fullname, length(fullname) - length(source_site_fullname)-1),",
+				"          point_relativename = right(fullname, length(fullname) - length(current_fullname)-1)\r",
+				"/*right(fullname, length(fullname) - length(source_site_fullname)-1)*/,",
 				"          rise_relativename = iif(\r",
 				"    lower(l5_process_group) == 'unknown' ||\r",
 				"    lower(l6_asset_l1) == 'unknown' ||\r",
 				"    lower(l7_asset_l2) == 'unknown' ||\r",
 				"    lower(l8_signal) == 'unknown',\r",
 				"\r",
-				"    right(fullname, length(fullname) - length(source_site_fullname) - 1),\r",
+				"    right(fullname, length(fullname) - length(current_fullname) - 1),\r",
 				"\r",
 				"    concatWS(\r",
 				"        '.',\r",
@@ -166,16 +160,16 @@
 				"     skipDuplicateMapOutputs: true) ~> ColumnsForOutput",
 				"ColumnsForOutput sort(asc(fullname, true)) ~> SortByFullname",
 				"SortByFullname alterRow(upsertIf(true())) ~> Upsert",
-				"PointsWithValidSiteMapping, PointMapping join(fullname == legacy_scada,",
+				"SitesInWasteModelOffice, PointMapping join(fullname == legacy_scada,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> FindPointsMapping",
-				"BuildRiseNames derive(rise_fullname = concat(rise_sitename,'.', rise_relativename)) ~> FinalRiseNames",
+				"BuildRiseNames derive(rise_fullname = concat(new_fullname,'.', rise_relativename)) ~> FinalRiseNames",
 				"FindPointsMapping filter(/*fullname=='WESTERN.READING.BASINGSTOKE.Stoneyfield SPS.Analogue.Average Calculation' || fullname=='WESTERN.READING.BASINGSTOKE.Stoneyfield SPS.Communications.GPRS Signal Strength' */\r",
 				"true() /*enable this line to disable the filter*/) ~> DebuggingFilter",
-				"GeoSCADAObjects, WasteModelOffice join(fullname == current_fullname,",
-				"     joinType:'inner',",
+				"GeoSCADAObjects, WasteModelOffice join(startsWith(fullname, concat(current_fullname, '.')),",
+				"     joinType:'cross',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> SitesInWasteModelOffice",
