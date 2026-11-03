@@ -13,6 +13,770 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ExportRiseJSONForSCXBuilder')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ExportJSON",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzurePostgreSqlSource",
+								"query": "SELECT fullname, typename, properties, aggregates \nFROM rise_objects\nORDER BY fullname asc;",
+								"partitionOption": "None",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings",
+									"filePattern": "arrayOfObjects"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "fullname",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['FullName']"
+										}
+									},
+									{
+										"source": {
+											"name": "typename",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['TypeName']"
+										}
+									},
+									{
+										"source": {
+											"name": "properties",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['Properties']"
+										}
+									},
+									{
+										"source": {
+											"name": "aggregates",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['Aggregates']"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_POST_RISE_Objects",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_BLOB_ADF_EXPORT",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest Point Mapping to Postgres')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Point Mapping to Postgres",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzurePostgreSqlSink",
+								"writeBatchSize": 1000000,
+								"writeBatchTimeout": "00:30:00",
+								"writeMethod": "CopyCommand"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Legacy SCADA",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "legacy_scada",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L4 Site Name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l4_site_name",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L5 Process Group",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l5_process_group",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L6 Asset L1",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l6_asset_l1",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L7 Asset L2",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l7_asset_l2",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L8 Signal",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l8_signal",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Extracted Site",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "extracted_site",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Match Key",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "match_key",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Generalised Key",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "generalised_key",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Review Status",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "review_status",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Confirmed L5 Process Group",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "confirmed_l5_process_group",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Confirmed L6 Asset L1",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "confirmed_l6_asset_l1",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Confirmed L7 Asset L2",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "confirmed_l7_asset_l2",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Confirmed L8 Signal",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "confirmed_l8_signal",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Point Type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "point_type",
+											"type": "String",
+											"physicalType": "text"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_BLOB_POINT_MAPPING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_POST_POINT_MAPPING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Ingestion Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest Site Mapping to Postgres')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Site Mapping to Postgres",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzurePostgreSqlSink",
+								"writeBatchSize": 1000000,
+								"writeBatchTimeout": "00:30:00",
+								"writeMethod": "CopyCommand"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Source_System",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "source_system",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "Source_Site_FullName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "source_site_fullname",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L1_Catchment_or_Region",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l1_catchment_or_region",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L2_STW_Catchment_or_Hydraulic_System",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l2_stw_catchment_or_hydraulic_system",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L3_Treatment_Network_or_Production",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l3_treatment_network_or_production",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "L4_Site_Name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "l4_site_name",
+											"type": "String",
+											"physicalType": "text"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_BLOB_SITE_MAPPING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_POST_SITE_MAPPING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Ingestion Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest WWT Data to Postgres')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copies WWT Geo SCADA Objects from blob storage into Postgres table and maps JSON properties to columns in Postgres",
+				"activities": [
+					{
+						"name": "Copy JSON to Postgres",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*.json",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzurePostgreSqlSink",
+								"writeBatchSize": 1000000,
+								"writeBatchTimeout": "00:30:00",
+								"writeMethod": "CopyCommand"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['FullName']"
+										},
+										"sink": {
+											"name": "fullname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['TypeName']"
+										},
+										"sink": {
+											"name": "typename",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Id']"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Properties']"
+										},
+										"sink": {
+											"name": "properties",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Aggregates']"
+										},
+										"sink": {
+											"name": "aggregates",
+											"type": "String"
+										}
+									}
+								],
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_BLOB_WWT_SCXExport_Data",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_POST_WWT_Objects",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Ingestion Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest Waste Model Office to Postgres')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Waste Model Office to Postgres",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFileName": "Waste Model Office v*.csv",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzurePostgreSqlSink",
+								"writeBatchSize": 1000000,
+								"writeBatchTimeout": "00:30:00",
+								"writeMethod": "CopyCommand"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "NEW FULLNAME",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "new_fullname",
+											"type": "String",
+											"physicalType": "text"
+										}
+									},
+									{
+										"source": {
+											"name": "CURRENT DATABASE NAME",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "current_fullname",
+											"type": "String",
+											"physicalType": "text"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_BLOB_WASTE_MODEL_OFFICE",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_POST_WASTE_MODEL_OFFICE",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Ingestion Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WWT Migration Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "WWT Points",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "WWT_Points_to_Rise",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"GeoSCADAObjects": {},
+									"SiteMapping": {},
+									"PointMapping": {},
+									"WasteModelOffice": {},
+									"SinkToDB": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "AzureIR-ManagedVNet",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Full Migration Pipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -105,7 +869,7 @@
 											"type": "String"
 										},
 										"sink": {
-											"path": "$['fullname']"
+											"path": "$['FullName']"
 										}
 									},
 									{
@@ -114,7 +878,7 @@
 											"type": "String"
 										},
 										"sink": {
-											"path": "$['typename']"
+											"path": "$['TypeName']"
 										}
 									},
 									{
@@ -123,7 +887,7 @@
 											"type": "String"
 										},
 										"sink": {
-											"path": "$['properties']"
+											"path": "$['Properties']"
 										}
 									},
 									{
@@ -132,7 +896,7 @@
 											"type": "String"
 										},
 										"sink": {
-											"path": "$['aggregates']"
+											"path": "$['Aggregates']"
 										}
 									}
 								]
@@ -159,7 +923,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/WWT Migration Pipeline')]"
+			]
 		}
 	]
 }
