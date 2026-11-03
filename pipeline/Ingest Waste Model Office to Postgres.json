@@ -44,7 +44,7 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "current_fullname",
+									"name": "new_fullname",
 									"type": "String",
 									"physicalType": "text"
 								}
