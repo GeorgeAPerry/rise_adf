@@ -19,27 +19,11 @@
 		},
 		"schema": [
 			{
-				"name": "Source_System",
+				"name": "NEW FULLNAME",
 				"type": "String"
 			},
 			{
-				"name": "Source_Site_FullName",
-				"type": "String"
-			},
-			{
-				"name": "L1_Catchment_or_Region",
-				"type": "String"
-			},
-			{
-				"name": "L2_STW_Catchment_or_Hydraulic_System",
-				"type": "String"
-			},
-			{
-				"name": "L3_Treatment_Network_or_Production",
-				"type": "String"
-			},
-			{
-				"name": "L4_Site_Name",
+				"name": "CURRENT DATABASE NAME",
 				"type": "String"
 			}
 		]
