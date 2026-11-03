@@ -1,0 +1,32 @@
+{
+	"name": "DS_POST_WASTE_MODEL_OFFICE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzurePostgreSql_postgres_DB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "PostGres"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "current_fullname",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "new_fullname",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "public",
+			"table": "waste_model_office"
+		}
+	}
+}
