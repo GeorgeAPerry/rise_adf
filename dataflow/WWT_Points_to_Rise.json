@@ -261,7 +261,7 @@
 				"sort1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'delimited',",
-				"     fileSystem: 'afdiagnostics',",
+				"     fileSystem: 'adfdiagnostics',",
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
