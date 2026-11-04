@@ -41,6 +41,20 @@
 						"type": "LinkedServiceReference"
 					},
 					"name": "SinkToDB"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_risedevstorage01",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_risedevstorage01",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink2"
 				}
 			],
 			"transformations": [
@@ -75,7 +89,22 @@
 					"name": "Split2"
 				},
 				{
+					"name": "derivedColumn1"
+				},
+				{
 					"name": "select1"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "sort2"
 				}
 			],
 			"scriptLines": [
@@ -186,14 +215,20 @@
 				"     disjoint: false) ~> split1@(Matched, Unmatched)",
 				"split1@Unmatched split(isNull(legacy_scada),",
 				"     disjoint: false) ~> Split2@(MissingInWWTDB, MissingInMappingSheet)",
-				"Split2@MissingInWWTDB select(mapColumn(",
+				"Split2@MissingInWWTDB derive(Comment = 'Object Fullname has no matching legacy_scada name in the Points Mapping sheet') ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
 				"          id,",
 				"          fullname,",
 				"          typename,",
-				"          properties,",
-				"          aggregates,",
 				"          current_fullname,",
 				"          new_fullname,",
+				"          Comment",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sort(asc(fullname, true)) ~> sort1",
+				"Split2@MissingInMappingSheet derive(Comment = 'Point missing in WWT Database') ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
 				"          legacy_scada,",
 				"          l4_site_name,",
 				"          l5_process_group,",
@@ -204,14 +239,12 @@
 				"          match_key,",
 				"          generalised_key,",
 				"          review_status,",
-				"          confirmed_l5_process_group,",
-				"          confirmed_l6_asset_l1,",
-				"          confirmed_l7_asset_l2,",
-				"          confirmed_l8_signal,",
-				"          point_type",
+				"          point_type,",
+				"          Comment",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 sort(asc(legacy_scada, true)) ~> sort2",
 				"Upsert sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table',",
@@ -224,7 +257,32 @@
 				"     keys:['fullname'],",
 				"     store: 'postgres',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> SinkToDB"
+				"     skipDuplicateMapOutputs: true) ~> SinkToDB",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'afdiagnostics',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['concat(replace(toString(currentDate()),\\':\\',\\'\\'),\\'_missing_legacy.csv\\')'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     partitionBy('hash', 1)) ~> sink1",
+				"sort2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'afdiagnostics',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['concat(replace(toString(currentDate()),\\':\\',\\'\\'),\\'_missing_in_wwt.csv\\')'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink2"
 			]
 		}
 	}
