@@ -757,7 +757,10 @@
 									"SiteMapping": {},
 									"PointMapping": {},
 									"WasteModelOffice": {},
-									"SinkToDB": {}
+									"SinkToDB": {},
+									"sink1": {},
+									"sink2": {},
+									"sink3": {}
 								}
 							},
 							"staging": {},

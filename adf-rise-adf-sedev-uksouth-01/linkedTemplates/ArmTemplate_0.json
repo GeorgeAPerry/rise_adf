@@ -1713,6 +1713,27 @@
 								"type": "LinkedServiceReference"
 							},
 							"name": "SinkToDB"
+						},
+						{
+							"linkedService": {
+								"referenceName": "ls_risedevstorage01",
+								"type": "LinkedServiceReference"
+							},
+							"name": "sink1"
+						},
+						{
+							"linkedService": {
+								"referenceName": "ls_risedevstorage01",
+								"type": "LinkedServiceReference"
+							},
+							"name": "sink2"
+						},
+						{
+							"linkedService": {
+								"referenceName": "ls_risedevstorage01",
+								"type": "LinkedServiceReference"
+							},
+							"name": "sink3"
 						}
 					],
 					"transformations": [
@@ -1747,7 +1768,34 @@
 							"name": "Split2"
 						},
 						{
+							"name": "derivedColumn1"
+						},
+						{
 							"name": "select1"
+						},
+						{
+							"name": "sort1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "sort2"
+						},
+						{
+							"name": "window2"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "filter2"
+						},
+						{
+							"name": "select3"
 						}
 					],
 					"scriptLines": [
@@ -1831,7 +1879,7 @@
 						"        iif(isNull(l8_signal), '', l8_signal)\r",
 						"    )\r",
 						")) ~> BuildRiseNames",
-						"FinalRiseNames select(mapColumn(",
+						"filter2 select(mapColumn(",
 						"          fullname = rise_fullname,",
 						"          properties,",
 						"          typename,",
@@ -1858,14 +1906,20 @@
 						"     disjoint: false) ~> split1@(Matched, Unmatched)",
 						"split1@Unmatched split(isNull(legacy_scada),",
 						"     disjoint: false) ~> Split2@(MissingInWWTDB, MissingInMappingSheet)",
-						"Split2@MissingInWWTDB select(mapColumn(",
+						"Split2@MissingInWWTDB derive(Comment = 'Object Fullname has no matching legacy_scada name in the Points Mapping sheet') ~> derivedColumn1",
+						"derivedColumn1 select(mapColumn(",
 						"          id,",
 						"          fullname,",
 						"          typename,",
-						"          properties,",
-						"          aggregates,",
 						"          current_fullname,",
 						"          new_fullname,",
+						"          Comment",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sort(asc(fullname, true)) ~> sort1",
+						"Split2@MissingInMappingSheet derive(Comment = 'Point missing in WWT Database') ~> derivedColumn2",
+						"derivedColumn2 select(mapColumn(",
 						"          legacy_scada,",
 						"          l4_site_name,",
 						"          l5_process_group,",
@@ -1876,14 +1930,25 @@
 						"          match_key,",
 						"          generalised_key,",
 						"          review_status,",
-						"          confirmed_l5_process_group,",
-						"          confirmed_l6_asset_l1,",
-						"          confirmed_l7_asset_l2,",
-						"          confirmed_l8_signal,",
-						"          point_type",
+						"          point_type,",
+						"          Comment",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select2 sort(asc(legacy_scada, true)) ~> sort2",
+						"FinalRiseNames window(over(rise_fullname),",
+						"     asc(legacy_scada, true),",
+						"     duplicate_row_number = rowNumber()) ~> window2",
+						"window2 filter(duplicate_row_number > 1) ~> filter1",
+						"window2 filter(duplicate_row_number == 1) ~> filter2",
+						"filter1 select(mapColumn(",
+						"          id,",
+						"          typename,",
+						"          legacy_scada,",
+						"          rise_fullname",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select3",
 						"Upsert sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'table',",
@@ -1896,12 +1961,50 @@
 						"     keys:['fullname'],",
 						"     store: 'postgres',",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> SinkToDB"
+						"     skipDuplicateMapOutputs: true) ~> SinkToDB",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'delimited',",
+						"     fileSystem: 'adfdiagnostics',",
+						"     columnDelimiter: ',',",
+						"     escapeChar: '\\\\',",
+						"     quoteChar: '\\\"',",
+						"     columnNamesAsHeader: true,",
+						"     partitionFileNames:[(concat(replace(toString(currentDate()),':',''),'_missing_legacy.csv'))],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     saveOrder: 1,",
+						"     partitionBy('hash', 1)) ~> sink1",
+						"sort2 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'delimited',",
+						"     fileSystem: 'adfdiagnostics',",
+						"     columnDelimiter: ',',",
+						"     escapeChar: '\\\\',",
+						"     quoteChar: '\\\"',",
+						"     columnNamesAsHeader: true,",
+						"     partitionFileNames:[(concat(replace(toString(currentDate()),':',''),'_missing_in_wwt.csv'))],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink2",
+						"select3 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'delimited',",
+						"     fileSystem: 'adfdiagnostics',",
+						"     columnDelimiter: ',',",
+						"     escapeChar: '\\\\',",
+						"     quoteChar: '\\\"',",
+						"     columnNamesAsHeader: true,",
+						"     partitionFileNames:[(concat(replace(toString(currentDate()),':',''),'_LegacyFullNamesWithDuplicateRiseNames.csv'))],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink3"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql_postgres_DB')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_risedevstorage01')]"
 			]
 		}
 	]
