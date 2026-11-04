@@ -55,6 +55,13 @@
 						"type": "LinkedServiceReference"
 					},
 					"name": "sink2"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_risedevstorage01",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink3"
 				}
 			],
 			"transformations": [
@@ -105,6 +112,18 @@
 				},
 				{
 					"name": "sort2"
+				},
+				{
+					"name": "window2"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "select3"
 				}
 			],
 			"scriptLines": [
@@ -188,7 +207,7 @@
 				"        iif(isNull(l8_signal), '', l8_signal)\r",
 				"    )\r",
 				")) ~> BuildRiseNames",
-				"FinalRiseNames select(mapColumn(",
+				"filter2 select(mapColumn(",
 				"          fullname = rise_fullname,",
 				"          properties,",
 				"          typename,",
@@ -245,6 +264,19 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select2",
 				"select2 sort(asc(legacy_scada, true)) ~> sort2",
+				"FinalRiseNames window(over(rise_fullname),",
+				"     asc(legacy_scada, true),",
+				"     duplicate_row_number = rowNumber()) ~> window2",
+				"window2 filter(duplicate_row_number > 1) ~> filter1",
+				"window2 filter(duplicate_row_number == 1) ~> filter2",
+				"filter1 select(mapColumn(",
+				"          id,",
+				"          typename,",
+				"          legacy_scada,",
+				"          rise_fullname",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
 				"Upsert sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table',",
@@ -282,7 +314,19 @@
 				"     partitionFileNames:['concat(replace(toString(currentDate()),\\':\\',\\'\\'),\\'_missing_in_wwt.csv\\')'],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> sink2"
+				"     partitionBy('hash', 1)) ~> sink2",
+				"select3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'adfdiagnostics',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:[(concat(replace(toString(currentDate()),':',''),'_LegacyFullNamesWithDuplicateRiseNames.csv'))],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink3"
 			]
 		}
 	}
